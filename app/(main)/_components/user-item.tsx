@@ -21,7 +21,7 @@ export const UserItem = () => {
           className="flex items-center text-sm p-3 w-full hover:bg-primary/5"
         >
           <div className="gap-x-2 flex items-center max-w-[150px]">
-            <Avatar h-5 w-5>
+            <Avatar className="h-5 w-5">
               <AvatarImage src={user?.imageUrl} />
             </Avatar>
             <span className="text-start font-medium line-clamp-1">

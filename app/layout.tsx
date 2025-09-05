@@ -6,9 +6,11 @@ import { ConvexClientProvider } from "@/components/providers/convex-provider";
 import { Toaster } from "sonner";
 import { ModalProvider } from "@/components/providers/modal-provider";
 
-import { EdgeStoreProvider } from "@/lib/edgestore";
+import { EdgeStoreProvider, useEdgeStore } from "@/lib/edgestore";
 
 import "./globals.css";
+import { UploaderProvider } from "@/components/upload/uploader-provider";
+import { UploaderWithEdgeStoreProvider } from "@/components/providers/uploader-with-edgestore";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter", // optional: useful if using CSS variables
@@ -39,20 +41,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <ConvexClientProvider>
           <EdgeStoreProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-              storageKey="motion-theme-2"
-            >
-              <Toaster position="bottom-center" />
-              <ModalProvider />
-              {children}
-            </ThemeProvider>
+            <UploaderWithEdgeStoreProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+                storageKey="motion-theme-2"
+              >
+                <Toaster position="bottom-center" />
+                <ModalProvider />
+                {children}
+              </ThemeProvider>
+            </UploaderWithEdgeStoreProvider>
           </EdgeStoreProvider>
         </ConvexClientProvider>
       </body>
