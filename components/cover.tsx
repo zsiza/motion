@@ -29,7 +29,6 @@ export const Cover = ({ url, preview }: CoverImageProps) => {
         url: url,
       });
     }
-
     removeCoverImage({
       id: params.documentId as Id<"documents">,
     });
