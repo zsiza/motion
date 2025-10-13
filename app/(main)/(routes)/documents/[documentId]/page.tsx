@@ -19,6 +19,7 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
     () => dynamic(() => import("@/components/editor"), { ssr: false }),
     []
   );
+
   const document = useQuery(api.documents.getByID, {
     documentId: params.documentId,
   });
@@ -50,7 +51,7 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
       <Cover url={document.coverImage} />
       <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
         <Toolbar initialData={document} />
-        <Editor />
+        <Editor onChange={onChange} initialContent={document.content} />
       </div>
     </div>
   );
