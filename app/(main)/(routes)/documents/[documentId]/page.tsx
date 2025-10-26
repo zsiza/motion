@@ -8,7 +8,11 @@ import { Cover } from "@/components/cover";
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
-
+import {
+  LiveblocksProvider,
+  RoomProvider,
+  ClientSideSuspense,
+} from "@liveblocks/react/suspense";
 interface DocumentIdPageProps {
   params: {
     documentId: Id<"documents">;
@@ -50,8 +54,19 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
     <div className="pb-40">
       <Cover url={document.coverImage} />
       <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
-        <Toolbar initialData={document} />
-        <Editor onChange={onChange} initialContent={document.content} />
+        <LiveblocksProvider
+          publicApiKey={
+            "pk_dev__IAkok0sgVLNV5xqwDioH9fTFqpWyTWhdR6QsCEAi-LnLEmkm3T0dA-Z5Skqqmtg"
+          }
+          throttle={16}
+        >
+          <RoomProvider id="my-room" initialPresence={{ cursor: null }}>
+            <ClientSideSuspense fallback={<div>Loading…</div>}>
+              <Toolbar initialData={document} />
+              <Editor onChange={onChange} initialContent={document.content} />
+            </ClientSideSuspense>
+          </RoomProvider>
+        </LiveblocksProvider>
       </div>
     </div>
   );
