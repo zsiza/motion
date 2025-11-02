@@ -7,46 +7,56 @@ import { Toolbar } from "@/components/toolbar";
 import { Cover } from "@/components/cover";
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
+import { useStorage } from "@liveblocks/react";
+import { LiveObject, LiveList } from "@liveblocks/client";
+
 import {
   LiveblocksProvider,
   RoomProvider,
   ClientSideSuspense,
+  useRoom,
 } from "@liveblocks/react/suspense";
+
 interface DocumentIdPageProps {
-  params: {
-    documentId: Id<"documents">;
-  };
+  params: { documentId: Id<"documents"> };
 }
-const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
+
+const DocumentContent = ({ document, params }: any) => {
+  const room = useRoom();
+  const update = useMutation(api.documents.update);
+  const content = useStorage((root) => root.content);
+
+  useEffect(() => {
+    if (!content) return;
+    const interval = setInterval(() => {
+      update({
+        id: params.documentId,
+        content: JSON.stringify(content),
+      });
+    }, 10000);
+    return () => clearInterval(interval);
+  }, [content, update, params.documentId]);
+
   const Editor = useMemo(
     () => dynamic(() => import("@/components/editor"), { ssr: false }),
     []
   );
 
+  return (
+    <>
+      <Toolbar initialData={document} />
+      <Editor editable />
+    </>
+  );
+};
+
+const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
   const document = useQuery(api.documents.getByID, {
     documentId: params.documentId,
   });
 
-  const update = useMutation(api.documents.update);
-
-  const onChange = (content: string) => {
-    update({ id: params.documentId, content });
-  };
-  if (document === undefined)
-    return (
-      <div>
-        <Cover.Skeleton />
-        <div className="md:max-w-3xl lg:max-w-4xl mx-auto mt-10">
-          <div className="space-y-4 pl-8 pt-4">
-            <Skeleton className="h-14 w-[50%]" />
-            <Skeleton className="h-4 w-[80%]" />
-            <Skeleton className="h-4 w-[40%]" />
-            <Skeleton className="h-4 w-[60%]" />
-          </div>
-        </div>
-      </div>
-    );
+  if (document === undefined) return <Skeleton className="h-screen" />;
 
   if (document === null) return <div>Document not found</div>;
 
@@ -54,16 +64,18 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
     <div className="pb-40">
       <Cover url={document.coverImage} />
       <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
-        <LiveblocksProvider
-          publicApiKey={
-            "pk_dev__IAkok0sgVLNV5xqwDioH9fTFqpWyTWhdR6QsCEAi-LnLEmkm3T0dA-Z5Skqqmtg"
-          }
-          throttle={16}
-        >
-          <RoomProvider id="my-room" initialPresence={{ cursor: null }}>
+        <LiveblocksProvider publicApiKey="pk_dev__IAkok0sgVLNV5xqwDioH9fTFqpWyTWhdR6QsCEAi-LnLEmkm3T0dA-Z5Skqqmtg">
+          <RoomProvider
+            id={params.documentId}
+            initialPresence={{ cursor: null }}
+            initialStorage={{
+              content: new LiveList(
+                document.content ? JSON.parse(document.content) : []
+              ),
+            }}
+          >
             <ClientSideSuspense fallback={<div>Loading…</div>}>
-              <Toolbar initialData={document} />
-              <Editor onChange={onChange} initialContent={document.content} />
+              <DocumentContent document={document} params={params} />
             </ClientSideSuspense>
           </RoomProvider>
         </LiveblocksProvider>
