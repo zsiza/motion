@@ -17,12 +17,13 @@ import {
   ClientSideSuspense,
   useRoom,
 } from "@liveblocks/react/suspense";
+import { useUser } from "@clerk/nextjs";
 
 interface DocumentIdPageProps {
   params: { documentId: Id<"documents"> };
 }
 
-const DocumentContent = ({ document, params }: any) => {
+export const DocumentContent = ({ document, params }: any) => {
   const room = useRoom();
   const update = useMutation(api.documents.update);
   const content = useStorage((root) => root.content);
@@ -52,6 +53,8 @@ const DocumentContent = ({ document, params }: any) => {
 };
 
 const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
+  const { user } = useUser();
+
   const document = useQuery(api.documents.getByID, {
     documentId: params.documentId,
   });
@@ -64,7 +67,18 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
     <div className="pb-40">
       <Cover url={document.coverImage} />
       <div className="md:max-w-3xl lg:max-w-4xl mx-auto">
-        <LiveblocksProvider publicApiKey="pk_dev__IAkok0sgVLNV5xqwDioH9fTFqpWyTWhdR6QsCEAi-LnLEmkm3T0dA-Z5Skqqmtg">
+        <LiveblocksProvider
+          resolveUsers={async ({ userIds }) => {
+            const { users } = await fetch("/api/liveblocks/resolve-users", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userIds }),
+            }).then((res) => res.json());
+
+            return users;
+          }}
+          authEndpoint="/api/liveblocks-auth"
+        >
           <RoomProvider
             id={params.documentId}
             initialPresence={{ cursor: null }}

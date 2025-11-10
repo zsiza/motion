@@ -42,7 +42,6 @@ const Editor = ({ editable }: EditorProps) => {
     DefaultStyleSchema
   >({
     uploadFile: handleUpload,
-    // do NOT pass an ad-hoc `schema` object here — the generics give you the correct types
   });
 
   if (!editor) {
@@ -61,9 +60,6 @@ const Editor = ({ editable }: EditorProps) => {
       className="relative min-h-screen flex flex-col"
       data-theme={resolvedTheme === "dark" ? "dark" : "light"}
     >
-      <VersionsDialog editor={editor} />
-      <NotificationsPopover />
-
       <BlockNoteView
         editor={editor}
         theme={resolvedTheme === "dark" ? "dark" : "light"}
