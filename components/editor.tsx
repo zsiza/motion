@@ -14,9 +14,25 @@ import { useMediaQuery } from "usehooks-ts";
 import NotificationsPopover from "./notifications-popover";
 import VersionsDialog from "./version-history-dialog";
 import { Spinner } from "./spinner";
+import { en } from "@blocknote/core/locales";
+import { en as aiEn } from "@blocknote/xl-ai/locales";
+import { BlockNoteEditor, filterSuggestionItems } from "@blocknote/core";
+import { DefaultChatTransport } from "ai";
+import {
+  AIMenuController,
+  AIToolbarButton,
+  createAIExtension,
+  getAISlashMenuItems,
+} from "@blocknote/xl-ai";
+import {
+  FormattingToolbar,
+  FormattingToolbarController,
+  getDefaultReactSlashMenuItems,
+  getFormattingToolbarItems,
+  SuggestionMenuController,
+} from "@blocknote/react";
 
 import {
-  defaultBlockSchema,
   defaultInlineContentSchema,
   defaultStyleSchema,
   DefaultBlockSchema,
@@ -41,6 +57,17 @@ const Editor = ({ editable }: EditorProps) => {
     DefaultInlineContentSchema,
     DefaultStyleSchema
   >({
+    dictionary: {
+      ...en,
+      ai: aiEn,
+    },
+    extensions: [
+      createAIExtension({
+        transport: new DefaultChatTransport({
+          api: `/api/chat `,
+        }),
+      }),
+    ],
     uploadFile: handleUpload,
   });
 
@@ -64,7 +91,13 @@ const Editor = ({ editable }: EditorProps) => {
         editor={editor}
         theme={resolvedTheme === "dark" ? "dark" : "light"}
         editable={editable}
-      />
+        formattingToolbar={false}
+        slashMenu={false}
+      >
+        <AIMenuController />
+        <FormattingToolbarWithAI />
+        <SuggestionMenuWithAI editor={editor} />
+      </BlockNoteView>
 
       <FloatingComposer editor={editor} className="w-[350px]" />
 
@@ -82,4 +115,37 @@ const Editor = ({ editable }: EditorProps) => {
   );
 };
 
+function FormattingToolbarWithAI() {
+  return (
+    <FormattingToolbarController
+      formattingToolbar={() => (
+        <FormattingToolbar>
+          {...getFormattingToolbarItems()}
+          {/* Add the AI button */}
+          <AIToolbarButton />
+        </FormattingToolbar>
+      )}
+    />
+  );
+}
+
+function SuggestionMenuWithAI(props: {
+  editor: BlockNoteEditor<any, any, any>;
+}) {
+  return (
+    <SuggestionMenuController
+      triggerCharacter="/"
+      getItems={async (query) =>
+        filterSuggestionItems(
+          [
+            ...getDefaultReactSlashMenuItems(props.editor),
+            // add the default AI slash menu items, or define your own
+            ...getAISlashMenuItems(props.editor),
+          ],
+          query
+        )
+      }
+    />
+  );
+}
 export default Editor;
