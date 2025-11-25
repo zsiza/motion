@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^1.0.29",
     "@ai-sdk/openai": "^2.0.69",
     "@blocknote/core": "^0.42.3",
     "@blocknote/mantine": "^0.42.3",
@@ -17,6 +18,7 @@
     "@clerk/nextjs": "^6.23.0",
     "@edgestore/react": "^0.5.3",
     "@edgestore/server": "^0.5.3",
+    "@google/genai": "^1.30.0",
     "@liveblocks/client": "^3.9.1",
     "@liveblocks/core": "^3.9.1",
     "@liveblocks/node": "^3.9.1",

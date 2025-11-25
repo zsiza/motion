@@ -23,6 +23,7 @@ import {
   AIToolbarButton,
   createAIExtension,
   getAISlashMenuItems,
+  getAIExtension,
 } from "@blocknote/xl-ai";
 import {
   FormattingToolbar,
@@ -30,6 +31,7 @@ import {
   getDefaultReactSlashMenuItems,
   getFormattingToolbarItems,
   SuggestionMenuController,
+  useBlockNoteContext,
 } from "@blocknote/react";
 
 import {
@@ -39,11 +41,16 @@ import {
   DefaultInlineContentSchema,
   DefaultStyleSchema,
 } from "@blocknote/core";
+import { useEffect, useState } from "react";
 interface EditorProps {
   editable?: boolean;
 }
 
 const Editor = ({ editable }: EditorProps) => {
+  const [model, setModel] = useState<string>(
+    "groq.chat/llama-3.3-70b-versatile"
+  );
+
   const { resolvedTheme } = useTheme();
   const { edgestore } = useEdgeStore();
 
@@ -79,6 +86,21 @@ const Editor = ({ editable }: EditorProps) => {
     );
   }
 
+  const ai = getAIExtension(editor);
+
+  useEffect(() => {
+    // update the default model in the extension
+    // Add the model string to the request body
+    ai.options.setState({
+      chatRequestOptions: {
+        body: {
+          model,
+        },
+      },
+    });
+  }, [model, ai.options]);
+
+  const existingContext = useBlockNoteContext();
   const { threads } = useThreads();
   const isMobile = useMediaQuery("(max-width: 768px)");
 
@@ -121,7 +143,6 @@ function FormattingToolbarWithAI() {
       formattingToolbar={() => (
         <FormattingToolbar>
           {...getFormattingToolbarItems()}
-          {/* Add the AI button */}
           <AIToolbarButton />
         </FormattingToolbar>
       )}
@@ -139,7 +160,6 @@ function SuggestionMenuWithAI(props: {
         filterSuggestionItems(
           [
             ...getDefaultReactSlashMenuItems(props.editor),
-            // add the default AI slash menu items, or define your own
             ...getAISlashMenuItems(props.editor),
           ],
           query
