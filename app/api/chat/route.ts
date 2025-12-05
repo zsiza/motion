@@ -13,7 +13,7 @@ const model = createGroq({
     (url) =>
       `${"https://localhost:3000/ai"}/proxy?provider=groq&url=${encodeURIComponent(url)}`
   ),
-  apiKey: "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", // the API key is not used as it's actually added in the proxy server
+  apiKey: process.env.GROQ_API_KEY!,
 })("llama-3.3-70b-versatile");
 
 function toolDefinitionsToToolSet(defs: any[]) {
