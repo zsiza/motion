@@ -7,9 +7,10 @@ import { Toolbar } from "@/components/toolbar";
 import { Cover } from "@/components/cover";
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
-import { useMemo, useEffect } from "react";
-import { useStorage } from "@liveblocks/react";
+import { useMemo, useEffect, useRef } from "react";
+import { useMyPresence, useOthers, useStorage } from "@liveblocks/react";
 import { LiveObject, LiveList } from "@liveblocks/client";
+import styles from "../../../../../components/cursor.module.css";
 
 import {
   LiveblocksProvider,
@@ -18,6 +19,8 @@ import {
   useRoom,
 } from "@liveblocks/react/suspense";
 import { useUser } from "@clerk/nextjs";
+import Cursor from "@/components/cursor";
+import CollaborativeCursors from "@/components/collaborative-cursors";
 
 interface DocumentIdPageProps {
   params: { documentId: Id<"documents"> };
@@ -90,6 +93,7 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
           >
             <ClientSideSuspense fallback={<div>Loading…</div>}>
               <DocumentContent document={document} params={params} />
+              <CollaborativeCursors />
             </ClientSideSuspense>
           </RoomProvider>
         </LiveblocksProvider>

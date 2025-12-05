@@ -6,20 +6,26 @@ import { Id } from "@/convex/_generated/dataModel";
 import { Cover } from "@/components/cover";
 import { Skeleton } from "@/components/ui/skeleton";
 import dynamic from "next/dynamic";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import {
   LiveblocksProvider,
   RoomProvider,
   ClientSideSuspense,
+  useMyPresence,
 } from "@liveblocks/react/suspense";
 import { LiveList } from "@liveblocks/client";
 import { DocumentContent } from "@/app/(main)/(routes)/documents/[documentId]/page";
+import styles from "../../../../../components/cursor.module.css";
+import { useOthers } from "@liveblocks/react";
+import Cursor from "@/components/cursor";
+import CollaborativeCursors from "@/components/collaborative-cursors";
 
 interface DocumentIdPageProps {
   params: {
     documentId: Id<"documents">;
   };
 }
+
 const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
   const Editor = useMemo(
     () => dynamic(() => import("@/components/editor"), { ssr: false }),
@@ -79,6 +85,7 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
           >
             <ClientSideSuspense fallback={<div>Loading…</div>}>
               <DocumentContent document={document} params={params} />
+              <CollaborativeCursors />
             </ClientSideSuspense>
           </RoomProvider>
         </LiveblocksProvider>
