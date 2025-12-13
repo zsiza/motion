@@ -9,11 +9,10 @@ import { ModalProvider } from "@/components/providers/modal-provider";
 import { EdgeStoreProvider, useEdgeStore } from "@/lib/edgestore";
 
 import "./globals.css";
-import { UploaderProvider } from "@/components/upload/uploader-provider";
 import { UploaderWithEdgeStoreProvider } from "@/components/providers/uploader-with-edgestore";
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter", // optional: useful if using CSS variables
+  variable: "--font-inter",
 });
 export const metadata: Metadata = {
   title: "Motion",
@@ -22,13 +21,13 @@ export const metadata: Metadata = {
     icon: [
       {
         media: "(prefers-color-scheme: light)",
-        url: "/favicon-light.svg",
-        href: "/favicon-light.svg",
+        url: "/favicon-light.ico",
+        href: "/favicon-light.ico",
       },
       {
         media: "(prefers-color-scheme: dark)",
-        url: "/favicon-dark.svg",
-        href: "/favicon-dark.svg",
+        url: "/favicon-dark.ico",
+        href: "/favicon-dark.ico",
       },
     ],
   },

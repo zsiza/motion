@@ -12,7 +12,7 @@ import {
   RoomProvider,
   ClientSideSuspense,
   useMyPresence,
-} from "@liveblocks/react/suspense";
+} from "@liveblocks/react";
 import { LiveList } from "@liveblocks/client";
 import { DocumentContent } from "@/app/(main)/(routes)/documents/[documentId]/page";
 import styles from "../../../../../components/cursor.module.css";

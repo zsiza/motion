@@ -8,14 +8,12 @@ import { en } from "@blocknote/core/locales";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
-  FloatingComposer,
   FormattingToolbar,
   FormattingToolbarController,
   getDefaultReactSlashMenuItems,
   getFormattingToolbarItems,
   SuggestionMenuController,
   useBlockNoteContext,
-  useCreateBlockNote,
 } from "@blocknote/react";
 import {
   AIMenuController,
@@ -23,7 +21,6 @@ import {
   ClientSideTransport,
   createAIExtension,
   fetchViaProxy,
-  getAIExtension,
   getAISlashMenuItems,
 } from "@blocknote/xl-ai";
 import "@blocknote/xl-ai/style.css";
@@ -33,33 +30,29 @@ import { useTheme } from "next-themes";
 import {
   useCreateBlockNoteWithLiveblocks,
   FloatingThreads,
+  FloatingComposer,
 } from "@liveblocks/react-blocknote";
-import { useThreads } from "@liveblocks/react";
+import { useThreads } from "@liveblocks/react/suspense";
 import { useMediaQuery } from "usehooks-ts";
 import { Spinner } from "./spinner";
 import { en as aiEn } from "@blocknote/xl-ai/locales";
-
 import {
   DefaultBlockSchema,
   DefaultInlineContentSchema,
   DefaultStyleSchema,
 } from "@blocknote/core";
+import { Suspense } from "react";
+
 interface EditorProps {
   editable?: boolean;
 }
 
-const COLORS = ["#DC2626", "#D97706", "#059669", "#7C3AED", "#DB2777"];
-// We define the model directly in our app using the Vercel AI SDK
 const model = createGroq({
-  // We supply a custom fetch function so that requests are routed through our proxy server
-  // (see `packages/xl-ai-server/src/routes/proxy.ts`)
-  // this is needed to hide the API key of our LLM provider from the client,
-  // and to prevent CORS issues
   fetch: fetchViaProxy(
     (url) => `$
     }/proxy?provider=groq&url=${encodeURIComponent(url)}`
   ),
-  apiKey: "fake-api-key", // the API key is not used as it's actually added in the proxy server
+  apiKey: "fake-api-key",
 })("llama-3.3-70b-versatile");
 
 const Editor = ({ editable }: EditorProps) => {
@@ -71,16 +64,11 @@ const Editor = ({ editable }: EditorProps) => {
     return response.url;
   };
 
-  const editor = useCreateBlockNoteWithLiveblocks<
-    DefaultBlockSchema,
-    DefaultInlineContentSchema,
-    DefaultStyleSchema
-  >({
+  const editor = useCreateBlockNoteWithLiveblocks({
     dictionary: {
       ...en,
-      ai: aiEn, // add default translations for the AI extension
+      ai: aiEn,
     },
-    // Register the AI extension
     extensions: [
       createAIExtension({
         transport: new ClientSideTransport({ model }),
@@ -89,6 +77,12 @@ const Editor = ({ editable }: EditorProps) => {
         },
       }),
     ],
+    tables: {
+      splitCells: true,
+      cellBackgroundColor: true,
+      cellTextColor: true,
+      headers: true,
+    },
 
     uploadFile: handleUpload,
   });
@@ -122,16 +116,16 @@ const Editor = ({ editable }: EditorProps) => {
         <SuggestionMenuWithAI editor={editor} />
       </BlockNoteView>
 
-      {/* <FloatingComposer editor={editor} className="w-[350px]" /> */}
+      <FloatingComposer editor={editor} className="w-[350px]" />
 
       {threads &&
         (isMobile ? (
-          <FloatingThreads threads={threads} editor={editor} />
+          <FloatingThreads editor={editor} threads={threads} />
         ) : (
           <FloatingThreads
-            threads={threads}
             editor={editor}
-            className="w-[350px] xl:mr-[100px] mr-[50px]"
+            threads={threads}
+            className="w-[350px]"
           />
         ))}
     </div>

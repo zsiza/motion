@@ -1,7 +1,7 @@
 "use client";
 import { useUpdateMyPresence, useOthers } from "@liveblocks/react";
 import { useEffect } from "react";
-import NameCursor from "./cursor"; // <-- your new cursor
+import NameCursor from "./cursor";
 
 export default function CollaborativeCursors() {
   const updateMyPresence = useUpdateMyPresence();

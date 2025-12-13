@@ -11,16 +11,17 @@ import { useMemo, useEffect, useRef } from "react";
 import { useMyPresence, useOthers, useStorage } from "@liveblocks/react";
 import { LiveObject, LiveList } from "@liveblocks/client";
 import styles from "../../../../../components/cursor.module.css";
-
+import Editor from "@/components/editor";
 import {
   LiveblocksProvider,
   RoomProvider,
   ClientSideSuspense,
   useRoom,
-} from "@liveblocks/react/suspense";
+} from "@liveblocks/react";
 import { useUser } from "@clerk/nextjs";
 import Cursor from "@/components/cursor";
 import CollaborativeCursors from "@/components/collaborative-cursors";
+import { Spinner } from "@/components/spinner";
 
 interface DocumentIdPageProps {
   params: { documentId: Id<"documents"> };
@@ -42,11 +43,6 @@ export const DocumentContent = ({ document, params }: any) => {
     return () => clearInterval(interval);
   }, [content, update, params.documentId]);
 
-  const Editor = useMemo(
-    () => dynamic(() => import("@/components/editor"), { ssr: false }),
-    []
-  );
-
   return (
     <>
       <Toolbar initialData={document} />
@@ -57,7 +53,6 @@ export const DocumentContent = ({ document, params }: any) => {
 
 const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
   const { user } = useUser();
-
   const document = useQuery(api.documents.getByID, {
     documentId: params.documentId,
   });
@@ -91,7 +86,13 @@ const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
               ),
             }}
           >
-            <ClientSideSuspense fallback={<div>Loading…</div>}>
+            <ClientSideSuspense
+              fallback={
+                <div className="min-h-screen  flex items-center justify-center">
+                  <Spinner size="lg" />
+                </div>
+              }
+            >
               <DocumentContent document={document} params={params} />
               <CollaborativeCursors />
             </ClientSideSuspense>

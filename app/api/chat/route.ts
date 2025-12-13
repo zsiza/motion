@@ -5,7 +5,7 @@ import { fetchViaProxy } from "@blocknote/xl-ai";
 export const maxDuration = 30;
 
 const groq = createGroq({
-  apiKey: process.env.GROQ_API_KEY!, // correct env
+  apiKey: process.env.GROQ_API_KEY!,
 });
 
 const model = createGroq({

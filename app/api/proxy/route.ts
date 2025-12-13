@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "API key missing" }, { status: 400 });
     }
 
-    // Forward request to Groq
     const groqResponse = await fetch(targetUrl, {
       method: "POST",
       headers: {
