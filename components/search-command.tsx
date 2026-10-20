@@ -1,10 +1,9 @@
 "use client";
-import { Key, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { File } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "convex/react";
 import { useUser } from "@clerk/clerk-react";
-import { use } from "react";
 
 import {
   CommandDialog,

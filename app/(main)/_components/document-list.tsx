@@ -3,7 +3,7 @@
 import { Id, Doc } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { useParams, useRouter } from "next/navigation";
-import { use, useState } from "react";
+import { useState } from "react";
 import { Item } from "./item";
 import { cn } from "@/lib/utils";
 import { api } from "@/convex/_generated/api";

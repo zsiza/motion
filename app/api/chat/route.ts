@@ -1,6 +1,5 @@
 import { createGroq } from "@ai-sdk/groq";
-import { convertToModelMessages, streamText } from "ai";
-import { fetchViaProxy } from "@blocknote/xl-ai";
+import { convertToModelMessages, streamText, type ToolSet } from "ai";
 
 export const maxDuration = 30;
 
@@ -8,19 +7,13 @@ const groq = createGroq({
   apiKey: process.env.GROQ_API_KEY!,
 });
 
-const model = createGroq({
-  fetch: fetchViaProxy(
-    (url) =>
-      `${"https://localhost:3000/ai"}/proxy?provider=groq&url=${encodeURIComponent(url)}`
-  ),
-  apiKey: process.env.GROQ_API_KEY!,
-})("llama-3.3-70b-versatile");
+type ToolDefinition = { name: string } & Record<string, unknown>;
 
-function toolDefinitionsToToolSet(defs: any[]) {
+function toolDefinitionsToToolSet(defs: ToolDefinition[]): ToolSet {
   if (!Array.isArray(defs)) return {};
 
-  return defs.reduce((acc: any, def: any) => {
-    acc[def.name] = def;
+  return defs.reduce<ToolSet>((acc, def) => {
+    acc[def.name] = def as unknown as ToolSet[string];
     return acc;
   }, {});
 }

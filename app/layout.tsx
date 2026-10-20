@@ -6,7 +6,7 @@ import { ConvexClientProvider } from "@/components/providers/convex-provider";
 import { Toaster } from "sonner";
 import { ModalProvider } from "@/components/providers/modal-provider";
 
-import { EdgeStoreProvider, useEdgeStore } from "@/lib/edgestore";
+import { EdgeStoreProvider } from "@/lib/edgestore";
 
 import "./globals.css";
 import { UploaderWithEdgeStoreProvider } from "@/components/providers/uploader-with-edgestore";

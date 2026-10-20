@@ -13,7 +13,6 @@ import {
   getDefaultReactSlashMenuItems,
   getFormattingToolbarItems,
   SuggestionMenuController,
-  useBlockNoteContext,
 } from "@blocknote/react";
 import {
   AIMenuController,
@@ -36,12 +35,6 @@ import { useThreads } from "@liveblocks/react/suspense";
 import { useMediaQuery } from "usehooks-ts";
 import { Spinner } from "./spinner";
 import { en as aiEn } from "@blocknote/xl-ai/locales";
-import {
-  DefaultBlockSchema,
-  DefaultInlineContentSchema,
-  DefaultStyleSchema,
-} from "@blocknote/core";
-import { Suspense } from "react";
 
 interface EditorProps {
   editable?: boolean;
@@ -86,6 +79,8 @@ const Editor = ({ editable }: EditorProps) => {
 
     uploadFile: handleUpload,
   });
+  const { threads } = useThreads();
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   if (!editor) {
     return (
@@ -94,10 +89,6 @@ const Editor = ({ editable }: EditorProps) => {
       </div>
     );
   }
-
-  const existingContext = useBlockNoteContext();
-  const { threads } = useThreads();
-  const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
     <div
@@ -146,7 +137,7 @@ function FormattingToolbarWithAI() {
 }
 
 function SuggestionMenuWithAI(props: {
-  editor: BlockNoteEditor<any, any, any>;
+  editor: BlockNoteEditor;
 }) {
   return (
     <SuggestionMenuController

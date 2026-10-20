@@ -1,46 +1,30 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
+import { use } from "react";
+import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { Cover } from "@/components/cover";
 import { Skeleton } from "@/components/ui/skeleton";
-import dynamic from "next/dynamic";
-import { useMemo, useRef } from "react";
 import {
   LiveblocksProvider,
   RoomProvider,
   ClientSideSuspense,
-  useMyPresence,
 } from "@liveblocks/react";
 import { LiveList } from "@liveblocks/client";
-import { DocumentContent } from "@/app/(main)/(routes)/documents/[documentId]/page";
-import styles from "../../../../../components/cursor.module.css";
-import { useOthers } from "@liveblocks/react";
-import Cursor from "@/components/cursor";
+import { DocumentContent } from "@/components/document-content";
 import CollaborativeCursors from "@/components/collaborative-cursors";
 
 interface DocumentIdPageProps {
-  params: {
-    documentId: Id<"documents">;
-  };
+  params: Promise<{ documentId: Id<"documents"> }>;
 }
 
-const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
-  const Editor = useMemo(
-    () => dynamic(() => import("@/components/editor"), { ssr: false }),
-    []
-  );
-
+const DocumentIdPage = (props: DocumentIdPageProps) => {
+  const params = use(props.params);
   const document = useQuery(api.documents.getByID, {
     documentId: params.documentId,
   });
 
-  const update = useMutation(api.documents.update);
-
-  const onChange = (content: string) => {
-    update({ id: params.documentId, content });
-  };
   if (document === undefined)
     return (
       <div>

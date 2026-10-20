@@ -1,58 +1,27 @@
 "use client";
 
-import { useMutation, useQuery } from "convex/react";
+import { use } from "react";
+import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { Toolbar } from "@/components/toolbar";
 import { Cover } from "@/components/cover";
 import { Skeleton } from "@/components/ui/skeleton";
-import dynamic from "next/dynamic";
-import { useMemo, useEffect, useRef } from "react";
-import { useMyPresence, useOthers, useStorage } from "@liveblocks/react";
-import { LiveObject, LiveList } from "@liveblocks/client";
-import styles from "../../../../../components/cursor.module.css";
-import Editor from "@/components/editor";
+import { LiveList } from "@liveblocks/client";
 import {
   LiveblocksProvider,
   RoomProvider,
   ClientSideSuspense,
-  useRoom,
 } from "@liveblocks/react";
-import { useUser } from "@clerk/nextjs";
-import Cursor from "@/components/cursor";
 import CollaborativeCursors from "@/components/collaborative-cursors";
+import { DocumentContent } from "@/components/document-content";
 import { Spinner } from "@/components/spinner";
 
 interface DocumentIdPageProps {
-  params: { documentId: Id<"documents"> };
+  params: Promise<{ documentId: Id<"documents"> }>;
 }
 
-export const DocumentContent = ({ document, params }: any) => {
-  const room = useRoom();
-  const update = useMutation(api.documents.update);
-  const content = useStorage((root) => root.content);
-
-  useEffect(() => {
-    if (!content) return;
-    const interval = setInterval(() => {
-      update({
-        id: params.documentId,
-        content: JSON.stringify(content),
-      });
-    }, 10000);
-    return () => clearInterval(interval);
-  }, [content, update, params.documentId]);
-
-  return (
-    <>
-      <Toolbar initialData={document} />
-      <Editor editable />
-    </>
-  );
-};
-
-const DocumentIdPage = ({ params }: DocumentIdPageProps) => {
-  const { user } = useUser();
+const DocumentIdPage = (props: DocumentIdPageProps) => {
+  const params = use(props.params);
   const document = useQuery(api.documents.getByID, {
     documentId: params.documentId,
   });
